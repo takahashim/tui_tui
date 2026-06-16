@@ -28,6 +28,26 @@ module TuiTui
       expect(shifted.cols).to eq(79)
     end
 
+    describe "#include? / #hit?" do
+      let(:rect) { Rect.new(row: 2, col: 3, rows: 4, cols: 5) }
+
+      it "includes cells inside the bounds, excludes those outside" do
+        expect(rect.include?(2, 3)).to be(true)   # top-left corner
+        expect(rect.include?(5, 7)).to be(true)   # bottom-right corner
+        expect(rect.include?(1, 3)).to be(false)  # row above
+        expect(rect.include?(6, 3)).to be(false)  # row below
+        expect(rect.include?(2, 2)).to be(false)  # col left
+        expect(rect.include?(2, 8)).to be(false)  # col right
+      end
+
+      it "hit? maps a MouseEvent to include?" do
+        inside = MouseEvent.new(action: :press, button: :left, row: 3, col: 4)
+        outside = MouseEvent.new(action: :press, button: :left, row: 9, col: 4)
+        expect(rect.hit?(inside)).to be(true)
+        expect(rect.hit?(outside)).to be(false)
+      end
+    end
+
     describe "#split_ratio" do
       let(:rect) { Rect.new(row: 1, col: 1, rows: 10, cols: 100) }
 

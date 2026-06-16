@@ -37,6 +37,14 @@ module TuiTui
       Rect.new(row: row, col: col + by, rows: rows, cols: cols - by)
     end
 
+    # Whether a 1-origin cell (row, col) falls inside this rectangle.
+    def include?(r, c)
+      r.between?(row, row + rows - 1) && c.between?(col, col + cols - 1)
+    end
+
+    # Whether a MouseEvent's cell falls inside this rectangle.
+    def hit?(mouse) = include?(mouse.row, mouse.col)
+
     # Carve `width` columns off the right edge for a scrollbar gutter. Returns
     # [body, gutter]; gutter is nil when the rect is too narrow to spare them.
     def split_gutter(width = 1)

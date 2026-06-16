@@ -26,6 +26,18 @@ module TuiTui
       canvas
     end
 
+    # Map a MouseEvent to the list index under it, or nil. Pass the same `rect`
+    # and `scrollbar:` used for `draw` so the gutter column is excluded and the
+    # scroll offset matches what was rendered. Returns nil for clicks outside the
+    # body or below the last item.
+    def index_at(rect, event, scrollbar: nil)
+      body = scrollbar ? rect.split_gutter.first : rect
+      return nil unless body.hit?(event)
+
+      index = @scroll.top + (event.row - body.row)
+      index < @scroll.count ? index : nil
+    end
+
     private
 
     def draw_scrollbar(canvas, gutter, theme)
