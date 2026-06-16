@@ -10,8 +10,12 @@ module TuiTui
   module TextView
     module_function
 
-    def draw(canvas, rect, lines = nil, top: 0, style: nil, scrollbar: nil, total: nil)
-      body, gutter = scrollbar ? rect.split_gutter : [rect, nil]
+    def draw(canvas, rect, lines = nil, top: 0, style: nil, scrollbar: nil, total: nil, auto: false)
+      # With auto:, reserve the gutter only when the content overflows the rect.
+      # When the total is unknown (lazy block, no total:), the bar is kept.
+      count = total || lines&.length
+      show_bar = scrollbar && !(auto && count && count <= rect.rows)
+      body, gutter = show_bar ? rect.split_gutter : [rect, nil]
       body.rows.times do |offset|
         index = top + offset
         content = lines ? lines[index] : yield(index)

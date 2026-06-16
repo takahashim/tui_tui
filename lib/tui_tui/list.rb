@@ -12,8 +12,10 @@ module TuiTui
       @scroll = scroll
     end
 
-    def draw(canvas, rect, highlight: nil, scrollbar: nil)
-      body, gutter = scrollbar ? rect.split_gutter : [rect, nil]
+    def draw(canvas, rect, highlight: nil, scrollbar: nil, auto: false)
+      # With auto:, reserve the gutter only when the content overflows the rect.
+      show_bar = scrollbar && !(auto && @scroll.count <= rect.rows)
+      body, gutter = show_bar ? rect.split_gutter : [rect, nil]
       @scroll.ensure_visible(body.rows)
       @scroll.each_visible(body.rows) do |index, offset|
         row = body.row + offset

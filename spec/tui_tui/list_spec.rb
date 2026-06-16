@@ -58,6 +58,25 @@ module TuiTui
       expect(canvas.cell(1, 1).char).to eq("i")
     end
 
+    describe "scrollbar auto:" do
+      it "hides the gutter when items fit the rect" do
+        canvas = Canvas.new(4, 8)
+        List.new(ScrollList.new(3)).draw(canvas, rect(4, 8), scrollbar: Theme::DEFAULT, auto: true) do |i, _s|
+          Line[Span["item#{i}"]]
+        end
+        expect(canvas.cell(1, 8).style).to be_nil
+      end
+
+      it "shows the gutter when items overflow the rect" do
+        canvas = Canvas.new(4, 8)
+        List.new(ScrollList.new(20)).draw(canvas, rect(4, 8), scrollbar: Theme::DEFAULT, auto: true) do |i, _s|
+          Line[Span["item#{i}"]]
+        end
+        gutter = (1..4).map { |r| canvas.cell(r, 8).style }
+        expect(gutter).to include(Theme::DEFAULT.scroll_track).or include(Theme::DEFAULT.scroll_thumb)
+      end
+    end
+
     describe "#index_at" do
       def press(row, col) = MouseEvent.new(action: :press, button: :left, row: row, col: col)
 

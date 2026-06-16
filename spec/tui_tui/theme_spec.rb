@@ -11,6 +11,30 @@ module TuiTui
       end
     end
 
+    describe "semantic status roles" do
+      it "exposes background-aware success/warning/danger/info styles" do
+        %i[success warning danger info].each do |role|
+          expect(Theme::DARK.public_send(role)).to be_a(Style)
+          expect(Theme::LIGHT.public_send(role)).to be_a(Style)
+        end
+        # tuned per background (light needs darker inks)
+        expect(Theme::LIGHT.danger).not_to eq(Theme::DARK.danger)
+        # status colours are hue-independent (same across presets on a background)
+        expect(Theme::WARM.success).to eq(Theme::DARK.success)
+        expect(Theme::MONO.danger).to eq(Theme::DARK.danger)
+      end
+
+      it "#status maps symbolic kinds (with aliases) to roles" do
+        d = Theme::DEFAULT
+        expect(d.status(:ok)).to eq(d.success)
+        expect(d.status(:success)).to eq(d.success)
+        expect(d.status(:warn)).to eq(d.warning)
+        expect(d.status(:error)).to eq(d.danger)
+        expect(d.status(:info)).to eq(d.info)
+        expect(d.status(:unknown)).to eq(d.text)
+      end
+    end
+
     it "defaults use explicit colours, not theme-dependent reverse/dim" do
       # colour bar, not reverse
       expect(Theme::DEFAULT.selection.attrs).to eq([])

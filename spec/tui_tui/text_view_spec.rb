@@ -41,6 +41,22 @@ module TuiTui
       expect((1..2).map { |r| canvas.cell(r, 6).style }).to include(Theme::DEFAULT.scroll_thumb)
     end
 
+    describe "scrollbar auto:" do
+      it "hides the gutter when the content fits the rect" do
+        canvas = Canvas.new(4, 8)
+        TextView.draw(canvas, rect(4, 8), %w[a b c], scrollbar: Theme::DEFAULT, auto: true)
+        # no gutter reserved: the full width is available for text
+        expect(canvas.cell(1, 8).style).to be_nil
+      end
+
+      it "shows the gutter when the content overflows the rect" do
+        canvas = Canvas.new(3, 8)
+        TextView.draw(canvas, rect(3, 8), (0..20).map { |i| "L#{i}" }, scrollbar: Theme::DEFAULT, auto: true)
+        gutter = (1..3).map { |r| canvas.cell(r, 8).style }
+        expect(gutter).to include(Theme::DEFAULT.scroll_track).or include(Theme::DEFAULT.scroll_thumb)
+      end
+    end
+
     it "draws styled Lines and arrays of Spans as given" do
       canvas = Canvas.new(1, 6)
       TextView.draw(canvas, rect(1, 6), [[Span["a", Style.new(fg: :red)], Span["b", Style.new(fg: :blue)]]])

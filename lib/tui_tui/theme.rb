@@ -22,23 +22,47 @@ module TuiTui
     :bar,
     :cursor,
     :scroll_track,
-    :scroll_thumb
+    :scroll_thumb,
+    # semantic status roles (hue-independent, background-aware)
+    :success,
+    :warning,
+    :danger,
+    :info
   )
 
   class Theme
+    # Map a symbolic status to its semantic role Style (with common aliases).
+    def status(kind)
+      case kind
+      when :ok, :success then success
+      when :warn, :warning then warning
+      when :error, :danger then danger
+      when :info then info
+      else text
+      end
+    end
+
     # Background-dependent neutral roles.
     SURFACES = {
       dark: {
         text: Style.new,
         muted: Style.new(fg: 245),
         bar: Style.new(fg: 252, bg: 238),
-        selection_dim: Style.new(fg: 247, bg: 238)
+        selection_dim: Style.new(fg: 247, bg: 238),
+        success: Style.new(fg: 71),
+        warning: Style.new(fg: 179),
+        danger: Style.new(fg: 167),
+        info: Style.new(fg: 110)
       },
       light: {
         text: Style.new,
         muted: Style.new(fg: 240),
         bar: Style.new(fg: 16, bg: 252),
-        selection_dim: Style.new(fg: 240, bg: 252)
+        selection_dim: Style.new(fg: 240, bg: 252),
+        success: Style.new(fg: 28),
+        warning: Style.new(fg: 130),
+        danger: Style.new(fg: 124),
+        info: Style.new(fg: 25)
       }
     }.freeze
 
@@ -79,7 +103,11 @@ module TuiTui
         bar: surface[:bar],
         cursor: selection,
         scroll_track: Style.new(fg: a[:line]),
-        scroll_thumb: Style.new(bg: a[:sel][1])
+        scroll_thumb: Style.new(bg: a[:sel][1]),
+        success: surface[:success],
+        warning: surface[:warning],
+        danger: surface[:danger],
+        info: surface[:info]
       )
     end
 
