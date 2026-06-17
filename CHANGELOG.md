@@ -13,6 +13,9 @@
 - `Theme` semantic status roles — `success` / `warning` / `danger` / `info`
   (background-aware, hue-independent) — plus `Theme#status(kind)` to map
   symbolic kinds (`:ok`, `:warn`, `:error`, `:info`, with aliases) to a role.
+- `CommandPalette`: a fuzzy-filtered command palette modal (type to narrow,
+  arrows or Ctrl-N/Ctrl-P to move, Enter to pick, Esc to cancel). Items are
+  arbitrary objects with an optional label block; resolves to the chosen item.
 - `ModalHost`: a host-side helper that owns the current modal widget, routing
   `MouseEvent`s to `#handle_mouse` and other events to `#handle`, and running an
   `on_result` callback when the widget resolves.

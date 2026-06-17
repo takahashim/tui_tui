@@ -10,11 +10,11 @@
 #
 # Keys: j/k (or ↑/↓) move, l/Enter/→ open dir, h/←/Backspace up, g/G top/bottom,
 # Tab switch pane, J/K (or mouse wheel) scroll the preview, w wrap, t theme, </> divider, / fuzzy find,
-# y copy the path (OSC 52), m actions menu, ? help, q (or Ctrl-C) quit.
+# y copy the path (OSC 52), : command palette, m actions menu, ? help, q (or Ctrl-C) quit.
 #
 # `/` is an incremental fuzzy finder built on TuiTui::Fuzzy (type to narrow,
 # matched characters highlighted, ↑↓ to navigate, Enter to open, Esc to cancel).
-# The m / ? / q modals are TuiTui widgets (Select, Help, Confirm).
+# The : / m / ? / q modals are TuiTui widgets (CommandPalette, Select, Help, Confirm).
 
 require "strscan"
 require_relative "../lib/tui_tui"
@@ -177,12 +177,27 @@ module FileBrowserSample
     ["t", "cycle theme (cool / warm / mono, follows light/dark)"],
     ["/", "fuzzy find (↑↓ navigate, Enter open, Esc cancel)"],
     ["y", "copy path to clipboard"],
+    [":", "command palette (fuzzy-run any command)"],
     ["m", "actions menu"],
     ["?", "this help"],
     ["q", "quit"],
   ].freeze
 
   ACTIONS = [["Up to parent", :parent], ["Refresh", :refresh], ["Quit", :quit]].freeze
+
+  # Commands surfaced in the ":" command palette. Each is [label, action]; the
+  # palette ranks by the label and resolves to the chosen pair (see run_command).
+  COMMANDS = [
+    ["Open selected entry", :open],
+    ["Up to parent directory", :parent],
+    ["Refresh listing", :refresh],
+    ["Toggle preview wrap", :wrap],
+    ["Cycle theme", :theme],
+    ["Copy path to clipboard", :copy],
+    ["Fuzzy find", :find],
+    ["Keyboard help", :help],
+    ["Quit", :quit],
+  ].freeze
 
   # The app: responds to view(size) -> Canvas and update(event) -> self | :quit,
   # which is all TuiTui::Runtime asks of it.
@@ -348,13 +363,39 @@ module FileBrowserSample
       end
     end
 
+    def open_help = open_modal(TuiTui::Help.new("Keys", HELP, theme: @theme)) { nil }
+
+    # The ":" command palette: a fuzzy-filtered list of every command. The palette
+    # ranks by the label and resolves to the chosen [label, action] pair (or
+    # :cancel on Esc), which run_command dispatches.
+    def open_palette
+      open_modal(TuiTui::CommandPalette.new(COMMANDS, theme: @theme) { |label, _action| label }) do |chosen|
+        run_command(chosen.last) if chosen.is_a?(Array)
+      end
+    end
+
+    def run_command(action)
+      case action
+      when :open then open_entry
+      when :parent then up_dir
+      when :refresh then load_entries
+      when :wrap then toggle_preview_wrap
+      when :theme then cycle_theme
+      when :copy then copy_path
+      when :find then enter_finder
+      when :help then open_help # palettes can chain into another modal
+      when :quit then :quit
+      end
+    end
+
     # --- input ---
 
     def handle_key(key)
       case key
       when "q", TuiTui::KeyCode::CTRL_C then confirm_quit
-      when "?" then open_modal(TuiTui::Help.new("Keys", HELP, theme: @theme)) { nil }
+      when "?" then open_help
       when "/" then enter_finder
+      when ":" then open_palette
       when "m" then open_actions
       when "l", "\r", :right then open_entry
       when "h", :left, TuiTui::KeyCode::BACKSPACE then up_dir # h / ← / Backspace
@@ -631,7 +672,7 @@ module FileBrowserSample
 
     def draw_status(canvas, rect)
       left = @finder ? " > #{@finder}" : " #{@dir}"
-      hints = @finder ? "Esc=cancel  Enter=open" : "?=help  /=find  m=menu  t=#{THEMES[@theme_i]}  q=quit"
+      hints = @finder ? "Esc=cancel  Enter=open" : "?=help  /=find  :=cmds  m=menu  t=#{THEMES[@theme_i]}  q=quit"
       right = "#{@list.cursor + 1}/#{@entries.size}  #{hints} "
       TuiTui::StatusBar.draw(canvas, rect, left: left, right: right, style: @styles[:bar])
     end
