@@ -91,6 +91,13 @@ module TuiTui
       end
     end
 
+    # The box-drawing probe only runs in #start (a real TTY); a constructed-only
+    # Screen stays ASCII so non-pty tests never depend on a terminal reply.
+    it "chrome defaults to ASCII before start" do
+      screen = Screen.new(nil, StringIO.new, StringIO.new, :ansi256)
+      expect(screen.chrome).to be(BoxChrome::ASCII)
+    end
+
     it "copy writes the OSC 52 clipboard sequence" do
       out = StringIO.new
       screen = Screen.new(nil, StringIO.new, out, :ansi256)

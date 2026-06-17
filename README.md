@@ -84,17 +84,12 @@ Glyphs are clipped at region edges, not split across them.
 Movement and redraw stay responsive, even with large content.
 Only changed rows are repainted, so cost scales with the change, not the screen size.
 
-#### N7: Width-safe UI chrome (ASCII).
+#### N7: Width-safe UI chrome.
 
-Self-drawn chrome uses only ASCII, color, and spacing.
-ASCII characters have a guaranteed width of 1.
-
-Unicode box-drawing characters are never used.
-Their width can vary under CJK terminal settings and break layouts.
-
-Vertical splits are drawn as a colored one-column gutter.
-Rules are drawn with ASCII `-` or a background fill.
-Selection is drawn with `:reverse`.
+Self-drawn chrome defaults to ASCII, color, and spacing, which have a guaranteed
+width of 1. Unicode box-drawing has an ambiguous width that can break layouts under
+CJK terminal settings, so it is only used when the terminal is confirmed to render
+it at width 1; otherwise the chrome falls back to ASCII.
 
 Content text, such as Japanese data, is measured with `Width`.
 It is clipped or padded to fit the available space.

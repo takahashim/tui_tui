@@ -163,6 +163,15 @@ module TuiTui
       expect(rows).to eq(["+----+", "|    |", "|    |", "+----+"])
     end
 
+    it "frame uses the canvas's Unicode chrome when set" do
+      canvas = Canvas.new(4, 6, chrome: BoxChrome::UNICODE)
+
+      canvas.frame(Rect.new(row: 1, col: 1, rows: 4, cols: 6))
+
+      rows = (1..4).map { |r| canvas.render_row(r, enabled: false) }
+      expect(rows).to eq(["┌────┐", "│    │", "│    │", "└────┘"])
+    end
+
     it "frames only the given sub-rectangle" do
       canvas = Canvas.new(3, 10)
 

@@ -13,9 +13,10 @@ module TuiTui
     TRACK = Theme::DEFAULT.scroll_track
     THUMB = Theme::DEFAULT.scroll_thumb
 
-    def draw(canvas, rect, top:, visible:, total:, track: "|", thumb: " ", track_style: TRACK, thumb_style: THUMB)
+    def draw(canvas, rect, top:, visible:, total:, track: nil, thumb: " ", track_style: TRACK, thumb_style: THUMB)
       return canvas if rect.rows <= 0
 
+      track ||= canvas.chrome.track
       length, offset = geometry(rect.rows, top, visible, total)
       rect.rows.times do |i|
         in_thumb = i >= offset && i < offset + length

@@ -40,5 +40,12 @@ module TuiTui
       expect(canvas.cell(3, 1).char).to eq("|")
       expect(canvas.cell(3, 1).style).to eq(Scrollbar::TRACK)
     end
+
+    it "draws the track with the canvas's chrome glyph" do
+      canvas = Canvas.new(4, 1, chrome: BoxChrome::UNICODE)
+      Scrollbar.draw(canvas, Rect.new(row: 1, col: 1, rows: 4, cols: 1), top: 0, visible: 4, total: 8)
+
+      expect(canvas.cell(3, 1).char).to eq("│")
+    end
   end
 end

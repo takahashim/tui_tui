@@ -5,6 +5,8 @@ require "io/console"
 require_relative "ansi"
 require_relative "size"
 require_relative "color_depth"
+require_relative "box_chrome"
+require_relative "box_prober"
 require_relative "canvas_compositor"
 require_relative "terminal_size"
 require_relative "event_stream"
@@ -15,12 +17,12 @@ module TuiTui
   class Screen
     DEFAULT_SIZE = Size.new(rows: 24, cols: 80)
 
-    def self.run(input: $stdin, output: $stdout, depth: ColorDepth.detect, mouse: mouse_default)
+    def self.run(input: $stdin, output: $stdout, depth: ColorDepth.detect, mouse: mouse_default, box: ENV["TUITUI_BOX"])
       console = IO.console
       # Let callers provide a non-interactive fallback for piped output.
       return yield(nil) if console.nil? || !output.tty?
 
-      screen = new(console, input, output, depth, mouse: mouse)
+      screen = new(console, input, output, depth, mouse: mouse, box: box)
       screen.start
       begin
         yield screen
@@ -33,8 +35,12 @@ module TuiTui
       !%w[0 off false].include?(ENV["TUITUI_MOUSE"])
     end
 
-    def initialize(console, input, output, depth, mouse: true)
+    def initialize(console, input, output, depth, mouse: true, box: nil)
+      @input = input
       @output = output
+      @box_override = box
+      # ASCII until start probes a real TTY; safe for non-TTY/StringIO callers.
+      @chrome = BoxChrome::ASCII
       @compositor = CanvasCompositor.new(depth: depth)
       @term_size = TerminalSize.new(console, default: DEFAULT_SIZE)
       @events = EventStream.new(input: input, size: @term_size)
@@ -44,9 +50,19 @@ module TuiTui
       @cursor = nil
     end
 
-    attr_reader :events
+    attr_reader :events, :chrome
 
-    def start = @session.start
+    def start
+      @session.start
+      # Probe box-drawing support once, after raw mode + alt screen, before the
+      # first render/next_event so the DSR reply never reaches the key reader.
+      @chrome = BoxChrome.resolve(
+        input: @input,
+        output: @output,
+        term_cols: size.cols,
+        env: {"TUITUI_BOX" => @box_override}
+      )
+    end
 
     def size = @term_size.size
 

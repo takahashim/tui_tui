@@ -5,6 +5,7 @@ require_relative "text_sanitizer"
 require_relative "display_text"
 require_relative "style"
 require_relative "cell"
+require_relative "box_chrome"
 
 module TuiTui
   # Pure drawing surface. Coordinates are 1-origin to match terminal cursor
@@ -14,18 +15,20 @@ module TuiTui
     CONTROL_GLYPH = "?"
     FRAME = Style.new(fg: :bright_black)
 
-    def self.blank(size)
-      new(size.rows, size.cols)
+    def self.blank(size, chrome: BoxChrome::ASCII)
+      new(size.rows, size.cols, chrome: chrome)
     end
 
     attr_reader :rows, :cols
     attr_reader :cursor
+    attr_reader :chrome
 
-    def initialize(rows, cols)
+    def initialize(rows, cols, chrome: BoxChrome::ASCII)
       @rows = rows
       @cols = cols
       @grid = Array.new(rows) { Array.new(cols, Cell::BLANK) }
       @cursor = nil
+      @chrome = chrome
     end
 
     def cursor_at(row, col)
@@ -92,14 +95,14 @@ module TuiTui
       text(row, col, char * len, style)
     end
 
-    def frame(rect, style: FRAME)
+    def frame(rect, style: FRAME, chrome: @chrome)
       fill(rect, nil)
-      bar = "+#{"-" * (rect.cols - 2)}+"
-      text(rect.row, rect.col, bar, style)
-      text(rect.row + rect.rows - 1, rect.col, bar, style)
+      mid = chrome.h * (rect.cols - 2)
+      text(rect.row, rect.col, chrome.tl + mid + chrome.tr, style)
+      text(rect.row + rect.rows - 1, rect.col, chrome.bl + mid + chrome.br, style)
       (1...(rect.rows - 1)).each do |dy|
-        text(rect.row + dy, rect.col, "|", style)
-        text(rect.row + dy, rect.col + rect.cols - 1, "|", style)
+        text(rect.row + dy, rect.col, chrome.v, style)
+        text(rect.row + dy, rect.col + rect.cols - 1, chrome.v, style)
       end
 
       self

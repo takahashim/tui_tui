@@ -553,10 +553,11 @@ module FileBrowserSample
     # --- drawing ---
 
     # A dim vertical rule in the 1-column gutter between the panes (the column
-    # split_ratio left between list and preview). ASCII "|" (N7), dim like frames.
+    # split_ratio left between list and preview). Follows the canvas chrome:
+    # ASCII "|" by default, "│" when the terminal probed as Unicode-capable.
     def draw_divider(canvas, list_rect)
       col = list_rect.col + list_rect.cols
-      canvas.fill(TuiTui::Rect.new(row: list_rect.row, col: col, rows: list_rect.rows, cols: 1), @styles[:divider], "|")
+      canvas.fill(TuiTui::Rect.new(row: list_rect.row, col: col, rows: list_rect.rows, cols: 1), @styles[:divider], canvas.chrome.v)
     end
 
     def draw_list(canvas, rect)

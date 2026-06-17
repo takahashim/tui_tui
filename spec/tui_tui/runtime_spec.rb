@@ -25,6 +25,7 @@ module TuiTui
 
       def events = @events
       def size = Size.new(rows: 10, cols: 20)
+      def chrome = BoxChrome::ASCII
       def render(_canvas) = @renders += 1
       def invalidate = @invalidations += 1
       def copy(text) = @copies << text
@@ -122,7 +123,7 @@ module TuiTui
       expect(screen.renders).to eq(1)
     end
 
-    it "passes a RenderContext carrying the screen size to view" do
+    it "passes a RenderContext carrying the screen size and chrome to view" do
       ctx_app = Class
         .new do
           attr_reader :got
@@ -137,6 +138,7 @@ module TuiTui
       Runtime.new(ctx_app).run
 
       expect(ctx_app.got).to be_a(RenderContext)
+      expect(ctx_app.got.chrome).to be(BoxChrome::ASCII)
       expect([ctx_app.got.rows, ctx_app.got.cols]).to eq([10, 20])
     end
 

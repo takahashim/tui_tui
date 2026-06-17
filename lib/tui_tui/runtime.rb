@@ -10,8 +10,8 @@ module TuiTui
       @app = app
     end
 
-    def run(input: $stdin, output: $stdout, depth: ColorDepth.detect, tick: 0.1, mouse: Screen.mouse_default)
-      Screen.run(input: input, output: output, depth: depth, mouse: mouse) do |screen|
+    def run(input: $stdin, output: $stdout, depth: ColorDepth.detect, tick: 0.1, mouse: Screen.mouse_default, box: ENV["TUITUI_BOX"])
+      Screen.run(input: input, output: output, depth: depth, mouse: mouse, box: box) do |screen|
         raise "tui_tui: not a terminal" if screen.nil?
 
         screen.render(view(screen))
@@ -33,10 +33,10 @@ module TuiTui
 
     private
 
-    # Pass a RenderContext (size + a canvas factory). It is Size-compatible, so
-    # legacy `view(size)` apps keep working.
+    # Pass a RenderContext (size + resolved chrome + canvas factory). It is
+    # Size-compatible, so legacy `view(size)` apps keep working (ASCII).
     def view(screen)
-      @app.view(RenderContext.new(size: screen.size))
+      @app.view(RenderContext.new(size: screen.size, chrome: screen.chrome))
     end
 
     def flush_clipboard(screen)
