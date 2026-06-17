@@ -1,8 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.0] - 2026-06-17
 
 ### Added
+- Optional Unicode box-drawing chrome: probed once at startup and used only when
+  the terminal renders it at width 1, else ASCII. Override with `TUITUI_BOX`.
+- `RenderContext` passed to `view` (a `Size`-compatible value with a `canvas`
+  factory); legacy `view(size)` apps keep working.
 - `Rect#include?(row, col)` and `Rect#hit?(mouse_event)` for mouse hit-testing.
 - `List#index_at(rect, event, scrollbar:)` to map a click to a list index,
   accounting for the scroll offset and the scrollbar gutter.
@@ -20,7 +24,7 @@
   `-w` by removing the `Data`-generated `.[]` before redefining the convenience
   constructor.
 
-## [0.1.0]
+## [0.1.0] - 2026-06-16
 
 ### Added
 - Initial release: a lightweight, dependency-free (io/console only) TEA-inspired

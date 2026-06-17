@@ -100,6 +100,7 @@ Environment variables (all optional):
 
 - `TUITUI_MOUSE` — set to `0`/`off`/`false` to disable mouse reporting (on by default).
 - `TUITUI_BACKGROUND` — `light` or `dark` to pick the theme for your terminal background. Without it, `COLORFGBG` is read if present, otherwise `dark` is assumed (reliable auto-detection isn't possible on all terminals).
+- `TUITUI_BOX` — `ascii` / `unicode` / `auto` to force or auto-detect Unicode box-drawing chrome (default `auto`: used only when the terminal renders it at width 1, else ASCII).
 
 ## Installation
 
