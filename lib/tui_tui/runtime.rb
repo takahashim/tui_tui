@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "screen"
+require_relative "render_context"
 
 module TuiTui
   # Small Elm-style loop: render, read one event, fold it through the app, repeat.
@@ -13,7 +14,7 @@ module TuiTui
       Screen.run(input: input, output: output, depth: depth, mouse: mouse) do |screen|
         raise "tui_tui: not a terminal" if screen.nil?
 
-        screen.render(@app.view(screen.size))
+        screen.render(view(screen))
         loop do
           event = screen.events.next_event(tick: tick)
           break if event.is_a?(EofEvent)
@@ -25,12 +26,18 @@ module TuiTui
 
           @app = result
           flush_clipboard(screen)
-          screen.render(@app.view(screen.size))
+          screen.render(view(screen))
         end
       end
     end
 
     private
+
+    # Pass a RenderContext (size + a canvas factory). It is Size-compatible, so
+    # legacy `view(size)` apps keep working.
+    def view(screen)
+      @app.view(RenderContext.new(size: screen.size))
+    end
 
     def flush_clipboard(screen)
       # Clipboard writes stay an effect of the loop, requested by the app.

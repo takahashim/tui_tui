@@ -46,8 +46,9 @@ module WidgetsSample
       end
     end
 
-    def view(size)
-      canvas = TuiTui::Canvas.blank(size)
+    def view(ctx)
+      size = ctx.size
+      canvas = ctx.canvas
       canvas.text(2, 3, "TuiTui widget gallery", @theme.title)
       canvas.text(4, 3, "theme: #{THEMES[@theme_i]}", @theme.accent)
       canvas.text(5, 3, "last result: #{@last}", @theme.text)

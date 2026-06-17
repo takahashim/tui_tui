@@ -160,9 +160,10 @@ module PaintSample
       end
     end
 
-    def view(size)
+    def view(ctx)
+      size = ctx.size
       @rows = size.rows
-      canvas = TuiTui::Canvas.blank(size)
+      canvas = ctx.canvas
       @cells.each do |(row, col), color|
         next unless row.between?(PAINT_TOP, size.rows) && col.between?(1, size.cols)
 

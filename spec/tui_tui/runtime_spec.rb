@@ -122,6 +122,24 @@ module TuiTui
       expect(screen.renders).to eq(1)
     end
 
+    it "passes a RenderContext carrying the screen size to view" do
+      ctx_app = Class
+        .new do
+          attr_reader :got
+
+          def view(ctx) = (@got = ctx) && :canvas
+          def update(_event) = :quit
+        end
+        .new
+      screen = FakeScreen.new(Events.new([KeyEvent.new(key: "x")]))
+      allow(Screen).to receive(:run).and_yield(screen)
+
+      Runtime.new(ctx_app).run
+
+      expect(ctx_app.got).to be_a(RenderContext)
+      expect([ctx_app.got.rows, ctx_app.got.cols]).to eq([10, 20])
+    end
+
     it "drains a clipboard request the app queued during update (OSC 52)" do
       copier = Class
         .new do

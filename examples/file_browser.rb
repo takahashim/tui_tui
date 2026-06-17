@@ -288,8 +288,9 @@ module FileBrowserSample
 
     def monotonic = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-    def view(size)
-      canvas = TuiTui::Canvas.blank(size)
+    def view(ctx)
+      size = ctx.size
+      canvas = ctx.canvas
       body, status = split_status(size)
       list_rect, preview_rect = split_panes(body)
       @list_rect = list_rect       # remembered so a click can hit-test the list
