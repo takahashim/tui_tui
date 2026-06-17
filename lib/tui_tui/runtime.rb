@@ -26,6 +26,7 @@ module TuiTui
 
           @app = result
           flush_clipboard(screen)
+          flush_mouse(screen)
           screen.render(view(screen))
         end
       end
@@ -45,6 +46,14 @@ module TuiTui
 
       text = @app.take_clipboard
       screen.copy(text) if text
+    end
+
+    # Apps may release/recapture the mouse per frame (e.g. to allow a native
+    # terminal selection while a read-only pane is open).
+    def flush_mouse(screen)
+      return unless @app.respond_to?(:wants_mouse?)
+
+      screen.mouse = @app.wants_mouse?
     end
 
     def wants_redraw?(event)

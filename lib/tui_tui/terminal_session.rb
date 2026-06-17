@@ -24,6 +24,20 @@ module TuiTui
       at_exit { close }
     end
 
+    attr_reader :mouse
+
+    # Toggle mouse reporting mid-session. Releasing it (false) lets the user
+    # make a native terminal selection (drag to select / copy) over the alternate
+    # screen; re-enabling restores in-app mouse events. No-op if unchanged.
+    def mouse=(enabled)
+      enabled = !!enabled
+      return if @closed || enabled == @mouse
+
+      @output.write(enabled ? Ansi::MOUSE_ON : Ansi::MOUSE_OFF)
+      @output.flush
+      @mouse = enabled
+    end
+
     def close
       # Close is called from ensure, at_exit, and signal traps.
       return if @closed

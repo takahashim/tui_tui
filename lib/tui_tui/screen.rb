@@ -52,6 +52,14 @@ module TuiTui
 
     attr_reader :events, :chrome
 
+    # Toggle mouse reporting mid-session (so an app can release the mouse for a
+    # native terminal selection while a read-only pane is open).
+    def mouse=(enabled)
+      @session.mouse = enabled
+    end
+
+    def mouse = @session.mouse
+
     def start
       @session.start
       # Probe box-drawing support once, after raw mode + alt screen, before the

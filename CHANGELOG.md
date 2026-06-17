@@ -21,6 +21,9 @@
   `on_result` callback when the widget resolves.
 - `auto:` option for `List.draw` / `TextView.draw`: reserve the scrollbar gutter
   only when the content overflows the rect.
+- Per-frame mouse-reporting toggle: an app may implement `wants_mouse?` and the
+  `Runtime` applies it each frame (via `Screen#mouse=` / `TerminalSession#mouse=`),
+  so it can release the mouse for a native terminal selection and recapture it.
 
 ### Fixed
 - Silence the "method redefined; discarding old []" warning from `Span` under
