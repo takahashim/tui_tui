@@ -2,6 +2,7 @@
 
 require_relative "tui_tui/version"
 
+require_relative "tui_tui/clock"
 require_relative "tui_tui/width"
 require_relative "tui_tui/text_sanitizer"
 require_relative "tui_tui/display_text"

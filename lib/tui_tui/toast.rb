@@ -2,6 +2,7 @@
 
 require_relative "display_text"
 require_relative "style"
+require_relative "clock"
 
 module TuiTui
   # A transient notification overlay.
@@ -22,7 +23,7 @@ module TuiTui
       bottom_right: [:bottom, :right],
       center: [:middle, :center]
     }.freeze
-    MONOTONIC = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) }
+    MONOTONIC = -> { Clock.monotonic }
 
     def initialize(message, seconds: DEFAULT_SECONDS, position: DEFAULT_POSITION, clock: MONOTONIC)
       @message = DisplayText.new(message)

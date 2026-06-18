@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "box_chrome"
+require_relative "clock"
 
 module TuiTui
   # Measures how many columns a string of box-drawing glyphs actually occupies on
@@ -35,10 +36,10 @@ module TuiTui
     end
 
     def read_column(input)
-      deadline = monotonic + @timeout
+      deadline = Clock.monotonic + @timeout
       buf = +""
       loop do
-        remaining = deadline - monotonic
+        remaining = deadline - Clock.monotonic
         break if remaining <= 0
         break unless @wait.call(input, remaining)
 
@@ -55,7 +56,5 @@ module TuiTui
     end
 
     def wait_readable(io, timeout) = io.wait_readable(timeout)
-
-    def monotonic = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   end
 end
