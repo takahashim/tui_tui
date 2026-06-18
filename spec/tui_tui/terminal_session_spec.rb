@@ -5,8 +5,12 @@ require "stringio"
 
 module TuiTui
   RSpec.describe TerminalSession do
-    TerminalSessionConsole = Struct.new(:raws, :cookeds) do
-      def raw! = self.raws += 1
+    TerminalSessionConsole = Struct.new(:raws, :cookeds, :raw_opts) do
+      def raw!(**opts)
+        self.raw_opts = opts
+        self.raws += 1
+      end
+
       def cooked! = self.cookeds += 1
     end
 
@@ -21,6 +25,9 @@ module TuiTui
 
       session.start
       expect(console.raws).to eq(1)
+      # Raw mode keeps interrupt/quit/suspend live so Ctrl-C raises SIGINT (a real
+      # force-quit, restored by the INT trap) rather than arriving as a byte.
+      expect(console.raw_opts).to eq(intr: true)
       expect(output.string).to include(Ansi::ALT_ON)
       expect(output.string).to include(Ansi::MOUSE_ON)
 

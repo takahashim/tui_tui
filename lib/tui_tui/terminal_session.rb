@@ -16,7 +16,8 @@ module TuiTui
     end
 
     def start
-      @console.raw!
+      # `intr: true` keeps the interrupt/quit/suspend characters live in raw mode, so Ctrl-C raises SIGINT.
+      @console.raw!(intr: true)
       @output.write(Ansi::ALT_ON + Ansi::HIDE + Ansi::CLEAR + (@mouse ? Ansi::MOUSE_ON : ""))
       @output.flush
       @prev_winch = trap("WINCH") { @events.resized! }

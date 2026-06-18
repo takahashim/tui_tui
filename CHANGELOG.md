@@ -15,6 +15,11 @@
   `Runtime` applies it each frame (via `Screen#mouse=` / `TerminalSession#mouse=`),
   so it can release the mouse for a native terminal selection and recapture it.
 
+### Fixed
+- Raw mode now keeps the interrupt/quit/suspend characters live (`raw!(intr:
+  true)`), so Ctrl-C raises `SIGINT` (a real force-quit, restored by the INT
+  trap) instead of arriving as a byte.
+
 ## [0.2.0] - 2026-06-17
 
 ### Added
