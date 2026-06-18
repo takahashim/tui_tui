@@ -47,9 +47,9 @@ module TuiTui
       expect(screen).to include("+--")
     end
 
-    it "accepts [text, style] lines and renders them with that style, plain strings still work" do
+    it "accepts Line/Span lines and renders them with that style, plain strings still work" do
       red = Style.new(fg: :red)
-      pager = Pager.new("Body", ["plain line", ["styled line", red]])
+      pager = Pager.new("Body", ["plain line", Line[Span["styled line", red]]])
       size = Size.new(rows: 12, cols: 40)
       canvas = Canvas.blank(size)
 

@@ -2,6 +2,8 @@
 
 require_relative "display_text"
 require_relative "style"
+require_relative "span"
+require_relative "line"
 require_relative "rect"
 require_relative "modal"
 require_relative "key_intent"
@@ -12,15 +14,16 @@ module TuiTui
     MARGIN = 2
     WHEEL = 3
 
-    # `lines` are plain strings, or `[text, Style]` pairs to color a line (so a
-    # log/diff/error view can render severities). A bare string uses theme.muted.
+    # Each line may be a plain String, a `Line`, or an array of `Span`s, so a
+    # log/diff/error view can color whole lines or runs within them. Spans
+    # without a style fall back to theme.muted.
     def initialize(title, lines, start: 0, close_keys: [], theme: Theme::DEFAULT)
       @title = title
+      @theme = theme
       @lines = lines.map { |line| normalize_line(line) }
       @top = start
       @page = 1
       @close_keys = close_keys
-      @theme = theme
     end
 
     def handle(key)
@@ -59,11 +62,10 @@ module TuiTui
 
       canvas.text(rect.row + 1, rect.col + 2, DisplayText.new(title_line(body)).truncate(inner), theme.title)
       body.times do |offset|
-        entry = @lines[@top + offset]
-        next if entry.nil?
+        line = @lines[@top + offset]
+        next if line.nil?
 
-        text, style = entry
-        canvas.text(rect.row + 3 + offset, rect.col + 2, text.truncate(inner), style || theme.muted)
+        canvas.line(rect.row + 3 + offset, rect.col + 2, line.truncate(inner))
       end
 
       canvas
@@ -71,10 +73,11 @@ module TuiTui
 
     private
 
-    # -> [DisplayText, Style|nil]. Accepts a bare string or a [text, style] pair.
+    # -> Line. Accepts a String, a Line, or a Span array; spans left unstyled
+    # default to theme.muted so a bare line still reads as muted body text.
     def normalize_line(line)
-      text, style = line.is_a?(Array) ? line : [line, nil]
-      [DisplayText.new(text.to_s), style]
+      spans = Line.coerce(line).spans.map { |span| Span[span.text, span.style || theme.muted] }
+      Line.new(spans)
     end
 
     def paginate(key)

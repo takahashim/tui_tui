@@ -42,15 +42,6 @@ module TuiTui
       )
     end
 
-    def as_line(content, style)
-      case content
-      when Line
-        content
-      when Array
-        Line.new(content)
-      else
-        Line[Span[content.to_s, style]]
-      end
-    end
+    def as_line(content, style) = Line.coerce(content, style)
   end
 end

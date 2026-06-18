@@ -3,9 +3,11 @@
 ## [Unreleased]
 
 ### Added
-- `Pager` accepts `[text, Style]` lines for per-line coloring: a bare string
-  still uses `theme.muted`, while an `[text, Style]` pair colors that line (so a
-  log / diff / error view can render severities).
+- `Pager` accepts styled lines for coloring: each line may be a plain `String`,
+  a `Line`, or an array of `Span`s, so a log / diff / error view can color whole
+  lines or runs within them. Unstyled spans fall back to `theme.muted`.
+- `Line.coerce(content, style = nil)`: shared `String` / `Line` / `Span`-array →
+  `Line` conversion, now used by both `TextView` and `Pager`.
 - `CommandPalette`: a fuzzy-filtered command palette modal (type to narrow,
   arrows or Ctrl-N/Ctrl-P to move, Enter to pick, Esc to cancel). Items are
   arbitrary objects with an optional label block; resolves to the chosen item.
