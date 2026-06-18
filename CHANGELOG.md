@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `Pager` accepts `[text, Style]` lines for per-line coloring: a bare string
+  still uses `theme.muted`, while an `[text, Style]` pair colors that line (so a
+  log / diff / error view can render severities).
+- `CommandPalette`: a fuzzy-filtered command palette modal (type to narrow,
+  arrows or Ctrl-N/Ctrl-P to move, Enter to pick, Esc to cancel). Items are
+  arbitrary objects with an optional label block; resolves to the chosen item.
+- Per-frame mouse-reporting toggle: an app may implement `wants_mouse?` and the
+  `Runtime` applies it each frame (via `Screen#mouse=` / `TerminalSession#mouse=`),
+  so it can release the mouse for a native terminal selection and recapture it.
+
 ## [0.2.0] - 2026-06-17
 
 ### Added
@@ -13,17 +26,11 @@
 - `Theme` semantic status roles — `success` / `warning` / `danger` / `info`
   (background-aware, hue-independent) — plus `Theme#status(kind)` to map
   symbolic kinds (`:ok`, `:warn`, `:error`, `:info`, with aliases) to a role.
-- `CommandPalette`: a fuzzy-filtered command palette modal (type to narrow,
-  arrows or Ctrl-N/Ctrl-P to move, Enter to pick, Esc to cancel). Items are
-  arbitrary objects with an optional label block; resolves to the chosen item.
 - `ModalHost`: a host-side helper that owns the current modal widget, routing
   `MouseEvent`s to `#handle_mouse` and other events to `#handle`, and running an
   `on_result` callback when the widget resolves.
 - `auto:` option for `List.draw` / `TextView.draw`: reserve the scrollbar gutter
   only when the content overflows the rect.
-- Per-frame mouse-reporting toggle: an app may implement `wants_mouse?` and the
-  `Runtime` applies it each frame (via `Screen#mouse=` / `TerminalSession#mouse=`),
-  so it can release the mouse for a native terminal selection and recapture it.
 
 ### Fixed
 - Silence the "method redefined; discarding old []" warning from `Span` under
