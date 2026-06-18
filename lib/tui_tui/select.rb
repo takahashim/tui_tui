@@ -91,11 +91,10 @@ module TuiTui
 
     # The item under a click, picked, or nil if the click missed the list.
     def click(event)
-      rect = @items_rect
-      return nil unless rect && event.col.between?(rect.col, rect.col + rect.cols - 1)
+      return nil unless @items_rect
 
-      index = @list.top + (event.row - rect.row)
-      return nil unless (event.row - rect.row).between?(0, rect.rows - 1) && !@list.empty? && index <= @list.last
+      index = List.new(@list).index_at(@items_rect, event)
+      return nil if index.nil?
 
       @list.go_to(index)
       @list.cursor
