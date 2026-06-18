@@ -47,6 +47,23 @@ module TuiTui
       expect(screen).to include("+--")
     end
 
+    it "accepts [text, style] lines and renders them with that style, plain strings still work" do
+      red = Style.new(fg: :red)
+      pager = Pager.new("Body", ["plain line", ["styled line", red]])
+      size = Size.new(rows: 12, cols: 40)
+      canvas = Canvas.blank(size)
+
+      pager.draw(canvas, size)
+      screen = (1..12).map { |r| canvas.render_row(r, enabled: false) }.join("\n")
+      expect(screen).to include("plain line")
+      expect(screen).to include("styled line")
+      # the styled row carries the SGR for the given fg; the plain row does not.
+      styled_row = (1..12).map { |r| canvas.render_row(r, enabled: true) }.find { |row| row.include?("styled line") }
+      plain_row = (1..12).map { |r| canvas.render_row(r, enabled: true) }.find { |row| row.include?("plain line") }
+      expect(styled_row).to match(/\e\[[0-9;]*3[19]m/) # a red/bright-red foreground SGR
+      expect(plain_row).not_to include("styled line")
+    end
+
     it "scrolling moves the window" do
       pager = Pager.new("Body", (1..50).map { |i| "line #{i}" })
       size = Size.new(rows: 12, cols: 40)

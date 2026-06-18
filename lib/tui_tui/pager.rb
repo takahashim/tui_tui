@@ -12,9 +12,11 @@ module TuiTui
     MARGIN = 2
     WHEEL = 3
 
+    # `lines` are plain strings, or `[text, Style]` pairs to color a line (so a
+    # log/diff/error view can render severities). A bare string uses theme.muted.
     def initialize(title, lines, start: 0, close_keys: [], theme: Theme::DEFAULT)
       @title = title
-      @lines = lines.map { |line| DisplayText.new(line) }
+      @lines = lines.map { |line| normalize_line(line) }
       @top = start
       @page = 1
       @close_keys = close_keys
@@ -57,16 +59,23 @@ module TuiTui
 
       canvas.text(rect.row + 1, rect.col + 2, DisplayText.new(title_line(body)).truncate(inner), theme.title)
       body.times do |offset|
-        line = @lines[@top + offset]
-        next if line.nil?
+        entry = @lines[@top + offset]
+        next if entry.nil?
 
-        canvas.text(rect.row + 3 + offset, rect.col + 2, line.truncate(inner), theme.muted)
+        text, style = entry
+        canvas.text(rect.row + 3 + offset, rect.col + 2, text.truncate(inner), style || theme.muted)
       end
 
       canvas
     end
 
     private
+
+    # -> [DisplayText, Style|nil]. Accepts a bare string or a [text, style] pair.
+    def normalize_line(line)
+      text, style = line.is_a?(Array) ? line : [line, nil]
+      [DisplayText.new(text.to_s), style]
+    end
 
     def paginate(key)
       case key
