@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "display_text"
+require_relative "text_sanitizer"
 require_relative "style"
 require_relative "scroll_list"
 require_relative "list"
@@ -58,7 +59,7 @@ module TuiTui
       when KeyCode::BACKSPACE, :backspace
         edit { @graphemes.pop }
       when String
-        edit { @graphemes.concat(key.grapheme_clusters) if printable?(key) }
+        edit { @graphemes.concat(key.grapheme_clusters) if TextSanitizer.printable?(key) }
       end
     end
 
@@ -119,8 +120,6 @@ module TuiTui
     end
 
     def label_text(item) = DisplayText.new(@label.call(item).to_s)
-
-    def printable?(string) = string.bytes.all? { |byte| byte >= 0x20 && byte != 0x7F }
 
     def visible_rows(size)
       room = [size.rows - 4, 1].max

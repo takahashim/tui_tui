@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "display_text"
+require_relative "text_sanitizer"
 require_relative "style"
 require_relative "modal"
 require_relative "key_code"
@@ -38,7 +39,7 @@ module TuiTui
       when :end
         edit { @pos = @graphemes.length }
       when String
-        edit { insert(key) if printable?(key) }
+        edit { insert(key) if TextSanitizer.printable?(key) }
       end
     end
 
@@ -102,10 +103,6 @@ module TuiTui
 
     def delete_forward
       @graphemes.delete_at(@pos) if @pos < @graphemes.length
-    end
-
-    def printable?(string)
-      string.bytes.all? { |byte| byte >= 0x20 && byte != 0x7F }
     end
   end
 end
