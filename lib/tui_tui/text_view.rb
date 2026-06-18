@@ -21,7 +21,7 @@ module TuiTui
         content = lines ? lines[index] : yield(index)
         next if content.nil?
 
-        canvas.line(body.row + offset, body.col, as_line(content, style).truncate(body.cols))
+        canvas.line(body.row + offset, body.col, Line.coerce(content, style).truncate(body.cols))
       end
 
       draw_scrollbar(canvas, gutter, top, total || lines&.length, body.rows, scrollbar) if gutter
@@ -41,7 +41,5 @@ module TuiTui
         thumb_style: theme.scroll_thumb
       )
     end
-
-    def as_line(content, style) = Line.coerce(content, style)
   end
 end

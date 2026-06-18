@@ -21,7 +21,7 @@ module TuiTui
         row = body.row + offset
         selected = index == @scroll.cursor
         canvas.fill(Rect.new(row: row, col: body.col, rows: 1, cols: body.cols), highlight) if highlight && selected
-        canvas.line(row, body.col, as_line(yield(index, selected)).truncate(body.cols))
+        canvas.line(row, body.col, Line.coerce(yield(index, selected)).truncate(body.cols))
       end
 
       draw_scrollbar(canvas, gutter, scrollbar) if gutter
@@ -53,7 +53,5 @@ module TuiTui
         thumb_style: theme.scroll_thumb
       )
     end
-
-    def as_line(content) = content.is_a?(Line) ? content : Line.new(Array(content))
   end
 end

@@ -10,11 +10,12 @@ module TuiTui
     # Convenience constructor: Line[Span["a", s1], Span["b", s2]].
     def self.[](*spans) = new(spans)
 
-    # Coerce loose content into a Line: a Line passes through, an Array becomes
-    # its spans, and anything else is one Span (in `style`, when given).
+    # Coerce loose content into a Line: a Line passes through, a Span or an Array
+    # of Spans is wrapped, and anything else is one Span (in `style`, when given).
     def self.coerce(content, style = nil)
       case content
       when Line then content
+      when Span then new([content])
       when Array then new(content)
       else Line[Span[content.to_s, style]]
       end

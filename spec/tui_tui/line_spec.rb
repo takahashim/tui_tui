@@ -18,6 +18,30 @@ module TuiTui
       expect(line.truncate(10)).to be(line)
     end
 
+    describe ".coerce" do
+      it "passes a Line through unchanged" do
+        line = Line[Span["x", s1]]
+        expect(Line.coerce(line)).to be(line)
+      end
+
+      it "wraps a bare Span" do
+        span = Span["x", s1]
+        result = Line.coerce(span)
+        expect(result.spans).to eq([span])
+      end
+
+      it "wraps an array of Spans" do
+        spans = [Span["a", s1], Span["b", s2]]
+        expect(Line.coerce(spans).spans).to eq(spans)
+      end
+
+      it "turns anything else into one Span carrying the given style" do
+        result = Line.coerce("hi", s1)
+        expect(result.to_s).to eq("hi")
+        expect(result.spans.map(&:style)).to eq([s1])
+      end
+    end
+
     describe "#truncate (style-preserving)" do
       it "keeps whole spans, cuts the boundary span, and appends the marker in its style" do
         # width 6
