@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - 2026-06-22
 
 ### Added
 - `Pager` accepts styled lines for coloring: each line may be a plain `String`,
